@@ -1,7 +1,7 @@
 package com.example.manajemenkaryawanproyek.controller;
 
 import com.example.manajemenkaryawanproyek.model.Proyek;
-import com.example.manajemenkaryawanproyek.service.DataService;
+import com.example.manajemenkaryawanproyek.service.ProyekService;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -10,34 +10,34 @@ import java.util.List;
 @RequestMapping("/proyek")
 public class ProyekController {
 
-    private final DataService dataService;
+    private final ProyekService proyekService;
 
-    public ProyekController(DataService dataService) {
-        this.dataService = dataService;
+    public ProyekController(ProyekService proyekService) {
+        this.proyekService = proyekService;
     }
 
     @GetMapping
     public List<Proyek> getAllProyek() {
-        return dataService.getAllProyek();
+        return proyekService.getAllProyek();
     }
 
     @GetMapping("/{kode}")
     public Proyek getProyekByKode(@PathVariable String kode) {
-        return dataService.getProyekByKode(kode).orElse(null);
+        return proyekService.getProyekByKode(kode).orElse(null);
     }
 
     @PostMapping
     public String addProyek(@RequestBody Proyek proyek) {
-        return dataService.addProyek(proyek);
+        return proyekService.addProyek(proyek);
     }
 
     @PutMapping("/{kode}")
     public String updateProyek(@PathVariable String kode, @RequestBody Proyek proyekUpdate) {
-        return dataService.updateProyek(kode, proyekUpdate);
+        return proyekService.updateProyek(kode, proyekUpdate);
     }
 
     @DeleteMapping("/{kode}")
     public String deleteProyek(@PathVariable String kode) {
-        return dataService.deleteProyek(kode);
+        return proyekService.deleteProyek(kode);
     }
 }

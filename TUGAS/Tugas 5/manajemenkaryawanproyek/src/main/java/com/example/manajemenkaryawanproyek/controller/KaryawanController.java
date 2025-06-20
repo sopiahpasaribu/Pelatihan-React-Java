@@ -1,7 +1,7 @@
 package com.example.manajemenkaryawanproyek.controller;
 
 import com.example.manajemenkaryawanproyek.model.Karyawan;
-import com.example.manajemenkaryawanproyek.service.DataService;
+import com.example.manajemenkaryawanproyek.service.KaryawanService;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -10,34 +10,34 @@ import java.util.List;
 @RequestMapping("/karyawan")
 public class KaryawanController {
 
-    private final DataService dataService;
+    private final KaryawanService karyawanService;
 
-    public KaryawanController(DataService dataService) {
-        this.dataService = dataService;
+    public KaryawanController(KaryawanService karyawanService) {
+        this.karyawanService = karyawanService;
     }
 
     @GetMapping
     public List<Karyawan> getAllKaryawan() {
-        return dataService.getAllKaryawan();
+        return karyawanService.getAllKaryawan();
     }
 
     @GetMapping("/{id}")
     public Karyawan getKaryawanById(@PathVariable String id) {
-        return dataService.getKaryawanById(id).orElse(null);
+        return karyawanService.getKaryawanById(id).orElse(null);
     }
 
     @PostMapping
     public String addKaryawan(@RequestBody Karyawan karyawan) {
-        return dataService.addKaryawan(karyawan);
+        return karyawanService.addKaryawan(karyawan);
     }
 
     @PutMapping("/{id}")
     public String updateKaryawan(@PathVariable String id, @RequestBody Karyawan karyawanUpdate) {
-        return dataService.updateKaryawan(id, karyawanUpdate);
+        return karyawanService.updateKaryawan(id, karyawanUpdate);
     }
 
     @DeleteMapping("/{id}")
     public String deleteKaryawan(@PathVariable String id) {
-        return dataService.deleteKaryawan(id);
+        return karyawanService.deleteKaryawan(id);
     }
 }
