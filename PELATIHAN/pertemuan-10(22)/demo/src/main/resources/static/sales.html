@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coffee Shop Sales Management</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            padding-top: 20px;
+        }
+        .card {
+            margin-bottom: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .card-header {
+            background-color: #6f4e37;
+            color: white;
+            border-radius: 10px 10px 0 0 !important;
+        }
+        .btn-coffee {
+            background-color: #6f4e37;
+            color: white;
+        }
+        .btn-coffee:hover {
+            background-color: #5a3d2b;
+            color: white;
+        }
+        .table-responsive {
+            margin-top: 20px;
+        }
+        .search-section {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="text-center mb-4"><i class="bi bi-cup-hot"></i> Coffee Shop Sales Management</h1>
+        
+        <!-- Main Dashboard -->
+        <div class="row">
+            <!-- Sales List -->
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0"><i class="bi bi-list-ul"></i> Sales Records</h5>
+                        <button class="btn btn-sm btn-light" onclick="loadAllSales()">
+                            <i class="bi bi-arrow-clockwise"></i> Refresh
+                        </button>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Date</th>
+                                        <th>Coffee</th>
+                                        <th>Barista</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="salesTableBody">
+                                    <!-- Sales data will be loaded here -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Actions Panel -->
+            <div class="col-md-4">
+                <!-- Add New Sale -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="bi bi-plus-circle"></i> Add New Sale</h5>
+                    </div>
+                    <div class="card-body">
+                        <form id="addSaleForm">
+                            <div class="mb-3">
+                                <label for="saleDate" class="form-label">Date</label>
+                                <input type="date" class="form-control" id="saleDate" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="coffeeCode" class="form-label">Coffee</label>
+                                <select class="form-select" id="coffeeCode" required>
+                                    <option value="">Select Coffee</option>
+                                    <!-- Coffee options will be loaded here -->
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label for="baristaId" class="form-label">Barista</label>
+                                <select class="form-select" id="baristaId" required>
+                                    <option value="">Select Barista</option>
+                                    <!-- Barista options will be loaded here -->
+                                </select>
+                            </div>
+                            <button type="submit" class="btn btn-coffee w-100">
+                                <i class="bi bi-save"></i> Save Sale
+                            </button>
+                        </form>
+                    </div>
+                </div>
+                
+                <!-- Search Panel -->
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="bi bi-search"></i> Search Sales</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label class="form-label">Search by:</label>
+                            <div class="d-grid gap-2">
+                                <button class="btn btn-outline-secondary" onclick="showSearchByDate()">
+                                    <i class="bi bi-calendar"></i> Date
+                                </button>
+                                <button class="btn btn-outline-secondary" onclick="showSearchByCoffee()">
+                                    <i class="bi bi-cup"></i> Coffee
+                                </button>
+                                <button class="btn btn-outline-secondary" onclick="showSearchByBarista()">
+                                    <i class="bi bi-person"></i> Barista
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Search by Date -->
+                        <div id="searchByDate" style="display: none;">
+                            <div class="mb-3">
+                                <label for="searchDate" class="form-label">Select Date</label>
+                                <input type="date" class="form-control" id="searchDate">
+                            </div>
+                            <button class="btn btn-coffee w-100" onclick="searchSalesByDate()">
+                                <i class="bi bi-search"></i> Search
+                            </button>
+                        </div>
+                        
+                        <!-- Search by Coffee -->
+                        <div id="searchByCoffee" style="display: none;">
+                            <div class="mb-3">
+                                <label for="searchCoffeeCode" class="form-label">Select Coffee</label>
+                                <select class="form-select" id="searchCoffeeCode">
+                                    <option value="">All Coffees</option>
+                                    <!-- Coffee options will be loaded here -->
+                                </select>
+                            </div>
+                            <button class="btn btn-coffee w-100" onclick="searchSalesByCoffee()">
+                                <i class="bi bi-search"></i> Search
+                            </button>
+                        </div>
+                        
+                        <!-- Search by Barista -->
+                        <div id="searchByBarista" style="display: none;">
+                            <div class="mb-3">
+                                <label for="searchBaristaId" class="form-label">Select Barista</label>
+                                <select class="form-select" id="searchBaristaId">
+                                    <option value="">All Baristas</option>
+                                    <!-- Barista options will be loaded here -->
+                                </select>
+                            </div>
+                            <button class="btn btn-coffee w-100" onclick="searchSalesByBarista()">
+                                <i class="bi bi-search"></i> Search
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Edit Modal -->
+        <div class="modal fade" id="editModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Edit Sale Record</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="editSaleForm">
+                            <input type="hidden" id="editSaleId">
+                            <div class="mb-3">
+                                <label for="editSaleDate" class="form-label">Date</label>
+                                <input type="date" class="form-control" id="editSaleDate" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="editCoffeeCode" class="form-label">Coffee</label>
+                                <select class="form-select" id="editCoffeeCode" required>
+                                    <!-- Coffee options will be loaded here -->
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label for="editBaristaId" class="form-label">Barista</label>
+                                <select class="form-select" id="editBaristaId" required>
+                                    <!-- Barista options will be loaded here -->
+                                </select>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="button" class="btn btn-coffee" onclick="updateSale()">Save Changes</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Base API URLs
+        const SALES_API_URL = 'http://localhost:8080/sales';
+        const COFFEE_API_URL = 'http://localhost:8080/coffee';
+        const BARISTA_API_URL = 'http://localhost:8080/baristas'; // Assuming you have a BaristaController
+        
+        // DOM Elements
+        const salesTableBody = document.getElementById('salesTableBody');
+        const coffeeCodeSelect = document.getElementById('coffeeCode');
+        const baristaIdSelect = document.getElementById('baristaId');
+        const searchCoffeeCodeSelect = document.getElementById('searchCoffeeCode');
+        const searchBaristaIdSelect = document.getElementById('searchBaristaId');
+        
+        // Initialize the page
+        document.addEventListener('DOMContentLoaded', function() {
+            loadAllSales();
+            loadCoffeeOptions();
+            loadBaristaOptions();
+        });
+        
+        // Load all sales
+        function loadAllSales() {
+            fetch(SALES_API_URL)
+                .then(response => response.json())
+                .then(data => {
+                    renderSalesTable(data);
+                })
+                .catch(error => {
+                    console.error('Error loading sales:', error);
+                    alert('Failed to load sales data');
+                });
+        }
+        
+        // Render sales table
+        function renderSalesTable(sales) {
+            salesTableBody.innerHTML = '';
+            
+            if (sales.length === 0) {
+                salesTableBody.innerHTML = '<tr><td colspan="5" class="text-center">No sales records found</td></tr>';
+                return;
+            }
+            
+            sales.forEach(sale => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${sale.id}</td>
+                    <td>${new Date(sale.date).toLocaleDateString()}</td>
+                    <td>${sale.coffee.merk} (${sale.coffee.code})</td>
+                    <td>${sale.barista.name} (ID: ${sale.barista.id})</td>
+                    <td>
+                        <button class="btn btn-sm btn-outline-primary" onclick="openEditModal(${sale.id})">
+                            <i class="bi bi-pencil"></i>
+                        </button>
+                        <button class="btn btn-sm btn-outline-danger" onclick="deleteSale(${sale.id})">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </td>
+                `;
+                salesTableBody.appendChild(row);
+            });
+        }
+        
+        // Load coffee options for dropdowns
+        function loadCoffeeOptions() {
+            fetch(COFFEE_API_URL)
+                .then(response => response.json())
+                .then(coffees => {
+                    // Clear existing options
+                    coffeeCodeSelect.innerHTML = '<option value="">Select Coffee</option>';
+                    searchCoffeeCodeSelect.innerHTML = '<option value="">All Coffees</option>';
+                    
+                    // Add coffee options
+                    coffees.forEach(coffee => {
+                        const option1 = document.createElement('option');
+                        option1.value = coffee.code;
+                        option1.textContent = `${coffee.merk} (${coffee.code})`;
+                        coffeeCodeSelect.appendChild(option1);
+                        
+                        const option2 = document.createElement('option');
+                        option2.value = coffee.code;
+                        option2.textContent = `${coffee.merk} (${coffee.code})`;
+                        searchCoffeeCodeSelect.appendChild(option2);
+                    });
+                    
+                    // Also populate the edit modal's coffee select
+                    const editCoffeeSelect = document.getElementById('editCoffeeCode');
+                    editCoffeeSelect.innerHTML = '';
+                    coffees.forEach(coffee => {
+                        const option = document.createElement('option');
+                        option.value = coffee.code;
+                        option.textContent = `${coffee.merk} (${coffee.code})`;
+                        editCoffeeSelect.appendChild(option);
+                    });
+                })
+                .catch(error => {
+                    console.error('Error loading coffee options:', error);
+                    alert('Failed to load coffee options');
+                });
+        }
+        
+        // Load barista options for dropdowns
+        function loadBaristaOptions() {
+            fetch(BARISTA_API_URL)
+                .then(response => response.json())
+                .then(baristas => {
+                    // Clear existing options
+                    baristaIdSelect.innerHTML = '<option value="">Select Barista</option>';
+                    searchBaristaIdSelect.innerHTML = '<option value="">All Baristas</option>';
+                    
+                    // Add barista options
+                    baristas.forEach(barista => {
+                        const option1 = document.createElement('option');
+                        option1.value = barista.id;
+                        option1.textContent = `${barista.name} (ID: ${barista.id})`;
+                        baristaIdSelect.appendChild(option1);
+                        
+                        const option2 = document.createElement('option');
+                        option2.value = barista.id;
+                        option2.textContent = `${barista.name} (ID: ${barista.id})`;
+                        searchBaristaIdSelect.appendChild(option2);
+                    });
+                    
+                    // Also populate the edit modal's barista select
+                    const editBaristaSelect = document.getElementById('editBaristaId');
+                    editBaristaSelect.innerHTML = '';
+                    baristas.forEach(barista => {
+                        const option = document.createElement('option');
+                        option.value = barista.id;
+                        option.textContent = `${barista.name} (ID: ${barista.id})`;
+                        editBaristaSelect.appendChild(option);
+                    });
+                })
+                .catch(error => {
+                    console.error('Error loading barista options:', error);
+                    alert('Failed to load barista options');
+                });
+        }
+        
+        // Add new sale
+        document.getElementById('addSaleForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const saleDate = document.getElementById('saleDate').value;
+            const coffeeCode = document.getElementById('coffeeCode').value;
+            const baristaId = document.getElementById('baristaId').value;
+            
+            if (!saleDate || !coffeeCode || !baristaId) {
+                alert('Please fill all fields');
+                return;
+            }
+            
+            const newSale = {
+                date: saleDate,
+                coffee: { code: coffeeCode },
+                barista: { id: baristaId }
+            };
+            
+            fetch(SALES_API_URL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(newSale)
+            })
+            .then(response => {
+                if (!response.ok) {
+                    return response.json().then(err => { throw err; });
+                }
+                return response.json();
+            })
+            .then(data => {
+                alert('Sale added successfully!');
+                document.getElementById('addSaleForm').reset();
+                loadAllSales();
+            })
+            .catch(error => {
+                console.error('Error adding sale:', error);
+                alert(`Failed to add sale: ${error.message || 'Unknown error'}`);
+            });
+        });
+        
+        // Open edit modal
+        function openEditModal(saleId) {
+            fetch(`${SALES_API_URL}/${saleId}`)
+                .then(response => response.json())
+                .then(sale => {
+                    document.getElementById('editSaleId').value = sale.id;
+                    document.getElementById('editSaleDate').value = sale.date.split('T')[0];
+                    document.getElementById('editCoffeeCode').value = sale.coffee.code;
+                    document.getElementById('editBaristaId').value = sale.barista.id;
+                    
+                    const editModal = new bootstrap.Modal(document.getElementById('editModal'));
+                    editModal.show();
+                })
+                .catch(error => {
+                    console.error('Error loading sale for edit:', error);
+                    alert('Failed to load sale data for editing');
+                });
+        }
+        
+        // Update sale
+        function updateSale() {
+            const saleId = document.getElementById('editSaleId').value;
+            const saleDate = document.getElementById('editSaleDate').value;
+            const coffeeCode = document.getElementById('editCoffeeCode').value;
+            const baristaId = document.getElementById('editBaristaId').value;
+            
+            if (!saleDate || !coffeeCode || !baristaId) {
+                alert('Please fill all fields');
+                return;
+            }
+            
+            const updatedSale = {
+                date: saleDate,
+                coffee: { code: coffeeCode },
+                barista: { id: baristaId }
+            };
+            
+            fetch(`${SALES_API_URL}/${saleId}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(updatedSale)
+            })
+            .then(response => {
+                if (!response.ok) {
+                    return response.json().then(err => { throw err; });
+                }
+                return response.json();
+            })
+            .then(data => {
+                alert('Sale updated successfully!');
+                bootstrap.Modal.getInstance(document.getElementById('editModal')).hide();
+                loadAllSales();
+            })
+            .catch(error => {
+                console.error('Error updating sale:', error);
+                alert(`Failed to update sale: ${error.message || 'Unknown error'}`);
+            });
+        }
+        
+        // Delete sale
+        function deleteSale(saleId) {
+            if (!confirm('Are you sure you want to delete this sale record?')) {
+                return;
+            }
+            
+            fetch(`${SALES_API_URL}/${saleId}`, {
+                method: 'DELETE'
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Failed to delete sale');
+                }
+                return response;
+            })
+            .then(() => {
+                alert('Sale deleted successfully!');
+                loadAllSales();
+            })
+            .catch(error => {
+                console.error('Error deleting sale:', error);
+                alert('Failed to delete sale');
+            });
+        }
+        
+        // Search functions
+        function showSearchByDate() {
+            hideAllSearchPanels();
+            document.getElementById('searchByDate').style.display = 'block';
+        }
+        
+        function showSearchByCoffee() {
+            hideAllSearchPanels();
+            document.getElementById('searchByCoffee').style.display = 'block';
+        }
+        
+        function showSearchByBarista() {
+            hideAllSearchPanels();
+            document.getElementById('searchByBarista').style.display = 'block';
+        }
+        
+        function hideAllSearchPanels() {
+            document.getElementById('searchByDate').style.display = 'none';
+            document.getElementById('searchByCoffee').style.display = 'none';
+            document.getElementById('searchByBarista').style.display = 'none';
+        }
+        
+        function searchSalesByDate() {
+            const date = document.getElementById('searchDate').value;
+            if (!date) {
+                alert('Please select a date');
+                return;
+            }
+            
+            fetch(`${SALES_API_URL}/date/${date}`)
+                .then(response => response.json())
+                .then(data => {
+                    renderSalesTable(data);
+                })
+                .catch(error => {
+                    console.error('Error searching by date:', error);
+                    alert('Failed to search by date');
+                });
+        }
+        
+        function searchSalesByCoffee() {
+            const coffeeCode = document.getElementById('searchCoffeeCode').value;
+            if (!coffeeCode) {
+                loadAllSales();
+                return;
+            }
+            
+            fetch(`${SALES_API_URL}/coffee/${coffeeCode}`)
+                .then(response => response.json())
+                .then(data => {
+                    renderSalesTable(data);
+                })
+                .catch(error => {
+                    console.error('Error searching by coffee:', error);
+                    alert('Failed to search by coffee');
+                });
+        }
+        
+        function searchSalesByBarista() {
+            const baristaId = document.getElementById('searchBaristaId').value;
+            if (!baristaId) {
+                loadAllSales();
+                return;
+            }
+            
+            fetch(`${SALES_API_URL}/barista/${baristaId}`)
+                .then(response => response.json())
+                .then(data => {
+                    renderSalesTable(data);
+                })
+                .catch(error => {
+                    console.error('Error searching by barista:', error);
+                    alert('Failed to search by barista');
+                });
+        }
+    </script>
+</body>
+</html>

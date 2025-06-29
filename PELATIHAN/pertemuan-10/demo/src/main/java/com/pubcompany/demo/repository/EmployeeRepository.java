@@ -1,9 +1,15 @@
 package com.pubcompany.demo.repository;
 
-import com.pubcompany.demo.model.Employee;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
+import java.util.List;
+import java.util.Optional;
 
-@Repository
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import com.pubcompany.demo.model.Employee;
+
 public interface EmployeeRepository extends JpaRepository<Employee, Long> {
+    // Add custom queries if needed
+    List<Employee> findEmployeeByEmail(String email);
+
+    Optional<Employee> findByEmail(String email);
 }
